@@ -61,7 +61,12 @@ def tool(
         )
 
         # Store metadata on the function for compatibility
-        func._berry_mcp_metadata = {"examples": examples or [], "original_name": func.__name__, "custom_name": tool_name, "custom_description": tool_description}
+        func._berry_mcp_metadata = {
+            "examples": examples or [],
+            "original_name": func.__name__,
+            "custom_name": tool_name,
+            "custom_description": tool_description,
+        }
 
         logger.debug(
             f"Tool registered for FastMCP: {tool_name} "
@@ -77,9 +82,9 @@ def register_tools_with_fastmcp(mcp_instance) -> None:
     """Register all collected tools with a FastMCP instance"""
     for tool_info in _tool_registry:
         # Use FastMCP's tool decorator
-        mcp_instance.tool(
-            name=tool_info["name"], description=tool_info["description"]
-        )(tool_info["func"])
+        mcp_instance.tool(name=tool_info["name"], description=tool_info["description"])(
+            tool_info["func"]
+        )
 
         logger.debug(f"Registered tool {tool_info['name']} with FastMCP")
 
