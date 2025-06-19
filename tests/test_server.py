@@ -51,25 +51,23 @@ def test_create_server():
                 assert server == mock_server
 
 
-@pytest.mark.asyncio
-async def test_run_stdio_server_basic():
+def test_run_stdio_server_basic():
     """Test basic stdio server startup"""
     with patch("berry_mcp.server.create_server") as mock_create:
         # Mock the FastMCP instance
-        mock_server = AsyncMock()
-        mock_server.run = AsyncMock()
+        mock_server = MagicMock()
+        mock_server.run = MagicMock()
         mock_create.return_value = mock_server
 
         # Should not raise exception
-        await run_stdio_server(server_name="test", log_level="INFO")
+        run_stdio_server(server_name="test", log_level="INFO")
 
         # Verify server was created and run was called
         mock_create.assert_called_once_with(None, "test", "INFO")
         mock_server.run.assert_called_once_with(transport="stdio")
 
 
-@pytest.mark.asyncio
-async def test_run_stdio_server_with_tool_modules():
+def test_run_stdio_server_with_tool_modules():
     """Test stdio server with custom tool modules"""
 
     # Create a mock tool module
@@ -81,12 +79,12 @@ async def test_run_stdio_server_with_tool_modules():
 
     with patch("berry_mcp.server.create_server") as mock_create:
         # Mock the FastMCP instance
-        mock_server = AsyncMock()
-        mock_server.run = AsyncMock()
+        mock_server = MagicMock()
+        mock_server.run = MagicMock()
         mock_create.return_value = mock_server
 
         # Run with custom tool modules
-        await run_stdio_server(tool_modules=[mock_module])
+        run_stdio_server(tool_modules=[mock_module])
 
         # Verify create_server was called with modules
         mock_create.assert_called_once_with([mock_module], None, "INFO")
@@ -111,17 +109,16 @@ def test_tool_decorator_integration():
     assert result == "HELLO"
 
 
-@pytest.mark.asyncio
-async def test_run_stdio_server_default_tools():
+def test_run_stdio_server_default_tools():
     """Test stdio server with default tools discovery"""
     with patch("berry_mcp.server.create_server") as mock_create:
         # Mock the FastMCP instance
-        mock_server = AsyncMock()
-        mock_server.run = AsyncMock()
+        mock_server = MagicMock()
+        mock_server.run = MagicMock()
         mock_create.return_value = mock_server
 
         # Run without custom tool modules (should use defaults)
-        await run_stdio_server()
+        run_stdio_server()
 
         # Should have called create_server with defaults
         mock_create.assert_called_once_with(None, None, "INFO")

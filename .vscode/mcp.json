@@ -1,21 +1,23 @@
 {
   "inputs": [],
   "servers": {
-    "berry-mcp-stdio": {
+    "berry-mcp-anthropic-test": {
       "type": "stdio",
       "command": "/home/richard/.local/bin/uv",
-      "args": ["run", "python", "-m", "berry_mcp"],
+      "args": ["run", "python", "-m", "berry_mcp", "--log-level", "DEBUG"],
+      "cwd": "/home/richard/Documents/python_projects/berry-mcp-anthropic",
       "env": {}
     },
-    "berry-mcp-custom-tools": {
+    "berry-mcp-anthropic-custom-tools": {
       "type": "stdio",
       "command": "/home/richard/.local/bin/uv",
       "args": ["run", "python", "-m", "berry_mcp"],
+      "cwd": "/home/richard/Documents/python_projects/berry-mcp-anthropic",
       "env": {
         "BERRY_MCP_TOOLS_PATH": "my_custom_tools"
       }
     },
-    "berry-mcp-sse": {
+    "berry-mcp-anthropic-sse": {
       "type": "sse",
       "url": "http://localhost:8080",
       "headers": {

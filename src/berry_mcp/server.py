@@ -47,14 +47,14 @@ def create_server(
     return mcp
 
 
-async def run_stdio_server(
+def run_stdio_server(
     tool_modules: Any = None, server_name: str | None = None, log_level: str = "INFO"
 ) -> None:
     """Run MCP server with stdio transport using FastMCP"""
     mcp = create_server(tool_modules, server_name, log_level)
 
-    # Run the server
-    await mcp.run(transport="stdio")  # type: ignore[func-returns-value]
+    # Run the server (FastMCP.run is synchronous)
+    mcp.run(transport="stdio")
 
 
 def auto_discover_tools(module: Any) -> None:
@@ -91,7 +91,7 @@ Environment Variables:
 Examples:
   # Run with stdio (for VS Code integration)
   berry-mcp
-  
+
   # With custom tools module
   BERRY_MCP_TOOLS_PATH=my_tools berry-mcp
 """,
@@ -134,12 +134,11 @@ Examples:
                     )
 
     try:
-        asyncio.run(
-            run_stdio_server(
-                tool_modules=tool_modules,
-                server_name=args.server_name,
-                log_level=args.log_level,
-            )
+        # FastMCP.run() is synchronous and handles its own event loop
+        run_stdio_server(
+            tool_modules=tool_modules,
+            server_name=args.server_name,
+            log_level=args.log_level,
         )
     except KeyboardInterrupt:
         print("Server stopped by user", file=sys.stderr)
@@ -150,9 +149,9 @@ Examples:
 
 
 # For backwards compatibility
-async def main() -> None:
+def main() -> None:
     """Main entry point (backwards compatibility)"""
-    await run_stdio_server()
+    run_stdio_server()
 
 
 if __name__ == "__main__":

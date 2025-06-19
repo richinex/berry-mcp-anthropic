@@ -9,26 +9,24 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 
-@pytest.mark.asyncio
-async def test_run_stdio_server():
+def test_run_stdio_server():
     """Test stdio server run function"""
     from berry_mcp.server import run_stdio_server
 
     # Mock FastMCP and dependencies
     with patch("berry_mcp.server.create_server") as mock_create_server:
-        mock_server = AsyncMock()
-        mock_server.run = AsyncMock()
+        mock_server = MagicMock()
+        mock_server.run = MagicMock()
         mock_create_server.return_value = mock_server
 
-        await run_stdio_server()
+        run_stdio_server()
 
         # Verify server was created and run
         mock_create_server.assert_called_once_with(None, None, "INFO")
         mock_server.run.assert_called_once_with(transport="stdio")
 
 
-@pytest.mark.asyncio
-async def test_run_stdio_server_with_tool_modules():
+def test_run_stdio_server_with_tool_modules():
     """Test stdio server with custom tool modules"""
     from berry_mcp.server import run_stdio_server
 
@@ -38,11 +36,11 @@ async def test_run_stdio_server_with_tool_modules():
     tool_modules = [mock_module1, mock_module2]
 
     with patch("berry_mcp.server.create_server") as mock_create_server:
-        mock_server = AsyncMock()
-        mock_server.run = AsyncMock()
+        mock_server = MagicMock()
+        mock_server.run = MagicMock()
         mock_create_server.return_value = mock_server
 
-        await run_stdio_server(tool_modules=tool_modules, server_name="custom-server")
+        run_stdio_server(tool_modules=tool_modules, server_name="custom-server")
 
         # Verify server was created with tool modules
         mock_create_server.assert_called_once_with(
@@ -73,13 +71,13 @@ def test_cli_main_stdio():
 
     with (
         patch("sys.argv", test_args),
-        patch("asyncio.run") as mock_asyncio_run,
+        patch("berry_mcp.server.run_stdio_server") as mock_run_stdio,
     ):
 
         cli_main()
 
-        # Should have called asyncio.run with run_stdio_server
-        mock_asyncio_run.assert_called_once()
+        # Should have called run_stdio_server directly (no asyncio.run needed)
+        mock_run_stdio.assert_called_once()
 
 
 def test_cli_main_http():
@@ -112,10 +110,8 @@ def test_main_backwards_compatibility():
     from berry_mcp.server import main
 
     with patch("berry_mcp.server.run_stdio_server") as mock_run_stdio:
-        # Call the backwards compatibility main function
-        import asyncio
-
-        asyncio.run(main())
+        # Call the backwards compatibility main function (now synchronous)
+        main()
 
         # Should have called run_stdio_server
         mock_run_stdio.assert_called_once()

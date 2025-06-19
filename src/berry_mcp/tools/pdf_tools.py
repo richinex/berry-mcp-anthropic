@@ -25,7 +25,7 @@ try:
     PYPDF2_AVAILABLE = True
 except ImportError:
     PYPDF2_AVAILABLE = False
-    PyPDF2 = None
+    PyPDF2 = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
 

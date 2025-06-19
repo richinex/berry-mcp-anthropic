@@ -81,30 +81,37 @@ jobs:
     - name: Test tool registry functionality
       run: |
         uv run python -c "
-        from berry_mcp.core.registry import ToolRegistry
-        from berry_mcp.tools import pdf_tools
-        registry = ToolRegistry()
-        registry.auto_discover_tools(pdf_tools)
-        tools = registry.list_tools()
-        print(f'Loaded {len(tools)} PDF tools: {tools}')
-        assert len(tools) >= 2, f'Expected at least 2 tools, got {len(tools)}'
+        from berry_mcp import create_server
+        from berry_mcp.tools.decorators import get_registered_tools
+        
+        # Create server which auto-discovers tools including PDF tools
+        server = create_server()
+        tools = get_registered_tools()
+        
+        # Filter for PDF tools
+        pdf_tools = [tool for tool in tools if 'pdf' in tool['name'].lower() or 'pdf' in tool['description'].lower()]
+        
+        print(f'Loaded {len(tools)} total tools')
+        print(f'PDF tools found: {len(pdf_tools)}')
+        for tool in pdf_tools:
+            print(f'  - {tool[\"name\"]}: {tool[\"description\"]}')
+        
+        assert len(pdf_tools) >= 2, f'Expected at least 2 PDF tools, got {len(pdf_tools)}'
+        print('✅ PDF tools test passed!')
         "
     
-    - name: Test HTTP server startup
+    - name: Test FastMCP server functionality
       run: |
-        echo "Testing HTTP server startup..."
-        # Start server in background with timeout
-        timeout 10s uv run python -m berry_mcp --transport http --port 9999 > server.log 2>&1 &
-        SERVER_PID=$!
-        sleep 3
+        echo "Testing FastMCP server functionality..."
+        # Test that server can be created and tools can be loaded
+        uv run python -c "
+        from berry_mcp import create_server, FastMCP
         
-        # Test if server is responding
-        if curl -f http://localhost:9999/ -o /dev/null -s; then
-          echo "HTTP server is responding correctly"
-        else
-          echo "HTTP server test skipped (FastAPI may not be available)"
-        fi
+        # Test server creation
+        server = create_server(server_name='ci-test-server')
+        print(f'✅ FastMCP server created: {server.name}')
         
-        # Clean up
-        kill $SERVER_PID 2>/dev/null || true
-        wait $SERVER_PID 2>/dev/null || true
+        # Test that it's a proper FastMCP instance  
+        assert isinstance(server, FastMCP), f'Expected FastMCP instance, got {type(server)}'
+        print('✅ FastMCP instance validation passed!')
+        "
