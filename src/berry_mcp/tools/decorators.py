@@ -61,12 +61,16 @@ def tool(
         )
 
         # Store metadata on the function for compatibility
-        setattr(func, "_berry_mcp_metadata", {  # noqa: B010
-            "examples": examples or [],
-            "original_name": func.__name__,
-            "custom_name": tool_name,
-            "custom_description": tool_description,
-        })
+        setattr(  # noqa: B010
+            func,
+            "_berry_mcp_metadata",
+            {
+                "examples": examples or [],
+                "original_name": func.__name__,
+                "custom_name": tool_name,
+                "custom_description": tool_description,
+            },
+        )
 
         logger.debug(
             f"Tool registered for FastMCP: {tool_name} "
