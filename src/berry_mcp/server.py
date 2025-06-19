@@ -54,7 +54,7 @@ async def run_stdio_server(
     mcp = create_server(tool_modules, server_name, log_level)
 
     # Run the server
-    await mcp.run(transport="stdio")
+    await mcp.run(transport="stdio")  # type: ignore[func-returns-value]
 
 
 def auto_discover_tools(module: Any) -> None:
